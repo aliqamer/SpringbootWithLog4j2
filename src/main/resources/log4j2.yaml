@@ -1,0 +1,57 @@
+Configutation:
+  name: Default
+  Properties:
+    Property:
+      - name: application-log
+        value: logs/
+      - name: archive
+        value: ${application-log}/archive
+  Appenders:
+    File:
+      name: FileAppender
+      fileName: ${application-log}/application.log
+      PatternLayout:
+        pattern: "%d{dd-MM-yyyy HH:mm:ss.SSS} [%t] [%level] [%logger{36}] - %msg%n"
+    RollingFile:
+      - name: t_file_appender
+        fileName: ${application-log}/transaction.log
+        filePattern: ${archive}/transaction_%d{yyyy-MM-dd-HH-mm}-%i.log.gz
+        PatternLayout:
+          pattern: "%msg%n"
+        Policies:
+          SizeBasedTriggeringPolicy:
+            size: 50 KB
+          TimeBasedTriggeringPolicy:
+            interval: 1
+        DefaultRollOverStrategy:
+          max: 30
+      - name: b_file_appender
+        fileName: ${application-log}/backend.log
+        filePattern: ${archive}/backend_%d{yyyy-MM-dd-HH-mm}-%i.log.gz
+        PatternLayout:
+          pattern: "%msg%n"
+        Policies:
+          SizeBasedTriggeringPolicy:
+            size: 50 KB
+        DefaultRollOverStrategy:
+          max: 10
+  Loggers:
+      Root:
+        level: info
+        AppenderRef:
+          - ref: FileAppender
+      Logger:
+        -
+          name: logger1
+          level: debug
+          additivity: 'false'
+          appender-ref:
+            level: debug
+            ref: t_file_appender
+        -
+          name: logger2
+          level: debug
+          additivity: 'false'
+          appender-ref:
+            level: debug
+            ref: b_file_appender
